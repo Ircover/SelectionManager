@@ -11,12 +11,12 @@ class MultipleSelection : SelectionManager {
 
     override fun selectPosition(position: Int) {
         if(isPositionSelected(position)) {
-            interceptors.launch(position, false) {
+            interceptors.withInterception(position, false) {
                 notifyListeners(position, false)
                 selectedPositions.remove(position)
             }
         } else {
-            interceptors.launch(position, true) {
+            interceptors.withInterception(position, true) {
                 notifyListeners(position, true)
                 selectedPositions.add(position)
             }
@@ -28,8 +28,8 @@ class MultipleSelection : SelectionManager {
     override fun registerSelectionChangeListener(listener: (position: Int, isSelected: Boolean) -> Unit) =
             createDisposableForListenerRegistration(listeners, listener)
 
-    override fun <T> getSelectedItems(itemsMapper: (Int) -> T): ArrayList<T> = selectedPositions.sortedBy { it }
-            .mapTo(arrayListOf(), itemsMapper)
+    override fun getSelectedPositions(): ArrayList<Int> = selectedPositions.sortedBy { it }
+            .toCollection(arrayListOf())
 
     override fun isAnySelected() = selectedPositions.isNotEmpty()
 

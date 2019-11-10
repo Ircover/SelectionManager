@@ -13,7 +13,7 @@ class SingleSelection : SelectionManager {
     }
     override fun selectPosition(position: Int) {
         if(selectedPosition != position) {
-            interceptors.launch(position, true) {
+            interceptors.withInterception(position, true) {
                 if (selectedPosition != POSITION_INVALID) {
                     notifyListeners(selectedPosition, false)
                 }
@@ -27,10 +27,10 @@ class SingleSelection : SelectionManager {
     override fun registerSelectionChangeListener(listener: (position: Int, isSelected: Boolean) -> Unit) =
             createDisposableForListenerRegistration(listeners, listener)
 
-    override fun <T> getSelectedItems(itemsMapper: (Int) -> T): ArrayList<T> {
-        val result = arrayListOf<T>()
+    override fun getSelectedPositions(): ArrayList<Int> {
+        val result = arrayListOf<Int>()
         if(selectedPosition != POSITION_INVALID) {
-            result.add(itemsMapper(selectedPosition))
+            result.add(selectedPosition)
         }
         return result
     }

@@ -1,19 +1,19 @@
 package ru.ircover.selectionmanager
 
-internal fun ArrayList<(Int, Boolean, () -> Unit) -> Unit>.launch(position: Int, isSelected: Boolean, callback: () -> Unit) {
+internal fun ArrayList<(Int, Boolean, () -> Unit) -> Unit>.withInterception(position: Int, isSelected: Boolean, callback: () -> Unit) {
     if(isEmpty()) {
         callback()
     } else {
-        launch(0, position, isSelected, callback)
+        withInterception(0, position, isSelected, callback)
     }
 }
 
-internal fun ArrayList<(Int, Boolean, () -> Unit) -> Unit>.launch(interceptorIndex: Int, position: Int, isSelected: Boolean, callback: () -> Unit) {
+private fun ArrayList<(Int, Boolean, () -> Unit) -> Unit>.withInterception(interceptorIndex: Int, position: Int, isSelected: Boolean, callback: () -> Unit) {
     this[interceptorIndex](position, isSelected) {
         if(interceptorIndex == size - 1) {
             callback()
         } else {
-            launch(interceptorIndex + 1, position, isSelected, callback)
+            withInterception(interceptorIndex + 1, position, isSelected, callback)
         }
     }
 }

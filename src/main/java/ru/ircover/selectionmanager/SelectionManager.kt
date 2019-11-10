@@ -7,7 +7,7 @@ interface SelectionManager {
     fun selectPosition(position: Int)
     fun isPositionSelected(position: Int): Boolean
     fun registerSelectionChangeListener(listener: (position: Int, isSelected: Boolean) -> Unit): Disposable
-    fun <T> getSelectedItems(itemsMapper: (Int) -> T): ArrayList<T>
+    fun getSelectedPositions(): ArrayList<Int>
     fun isAnySelected(): Boolean
     fun addSelectionInterceptor(interceptor: (position: Int, isSelected: Boolean, callback: () -> Unit) -> Unit): Disposable
 }
