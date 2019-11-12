@@ -5,7 +5,8 @@ class MultipleSelection : SelectionManager {
     private val selectedPositions: MutableSet<Int> = mutableSetOf()
     private val interceptors: ArrayList<(Int, Boolean, () -> Unit) -> Unit> = arrayListOf()
     override fun clearSelection() {
-        notifyListenersForSelected(false)
+        selectedPositions.sortedBy { it }
+                .forEach { position -> notifyListeners(position, false) }
         selectedPositions.clear()
     }
 
@@ -36,10 +37,6 @@ class MultipleSelection : SelectionManager {
     override fun addSelectionInterceptor(interceptor: (Int, Boolean, () -> Unit) -> Unit) =
             createDisposableForListenerRegistration(interceptors, interceptor)
 
-    private fun notifyListenersForSelected(isSelected: Boolean) {
-        selectedPositions.sortedBy { it }
-                .forEach { position -> notifyListeners(position, isSelected) }
-    }
     private fun notifyListeners(position: Int, isSelected: Boolean) {
         listeners.forEach { it(position, isSelected) }
     }
