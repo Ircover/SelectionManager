@@ -6,11 +6,11 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.3'
     }
 }
 plugins {
-    id "com.jfrog.bintray" version "1.7.3"
+    id "com.jfrog.bintray" version "1.8.3"
 }
 
 apply plugin: 'java-library'
@@ -30,17 +30,15 @@ install {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'org.junit.jupiter:junit-jupiter-api'
 
     testImplementation 'com.natpryce:hamkrest:1.4.2.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.0.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.0.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.1.0'
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     testImplementation 'org.mockito:mockito-core:2.8.9'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.0.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.0.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.0.1'
     testImplementation 'org.junit.vintage:junit-vintage-engine:4.12.0'
 }
 
@@ -62,20 +60,26 @@ compileTestKotlin {
 }
 
 bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    user = project.property('bintrayUser')
+    key = project.property('bintrayApiKey')
     // jFrog plugin must be declared for this line to work
     configurations = ['archives']
     // Package info for BinTray
     pkg {
-        repo = 'maven'
+        repo = 'selection-manager'
         userOrg = user
+        name = 'kotlin-mvvm-selection-manager'
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/bintray/gradle-bintray-plugin.git'
+        publish = true
         version {
-            name = '0.1'
+            name = '1.0.0'
             desc = 'Gradle Bintray Plugin 1.0 final'
-            vcsTag = '0.1'
+            vcsTag = '1.0.0'
+            gpg {
+                sign = true
+                passphrase = project.property('bintrayPass')
+            }
         }
     }
 }
