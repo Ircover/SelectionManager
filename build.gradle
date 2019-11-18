@@ -16,18 +16,7 @@ plugins {
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply plugin: 'maven-publish'
-apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            groupId "ru.ircover.selectionmanager"
-            artifactId "core"
-            version "1.0.0"
-        }
-    }
-}
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
