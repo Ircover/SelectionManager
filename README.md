@@ -37,3 +37,20 @@ Now you are ready to listen for changes. Selecting positions is as easy as calli
 If you don't need to listen changes but want to get all selected positions in the end, you should call `getSelectedPositions` (all `SelectionManager` objects can do it):
 
     fun getSelectedPositions(): ArrayList<Int> = selection.getSelectedPositions()
+
+## Interception
+
+Sometimes you need to postpone selection changes until some action done, for example, loading data about selected item. Here you can use interception and used for that method `addSelectionInterceptor`:
+
+    val interceptionDisposable =
+        selection.addSelectionInterceptor { position: Int, isSelected: Boolean, callback: () -> Unit ->
+            if(isSelected) {
+                val selectedItem = items[position] //example of getting item by existing parameters
+                val isDataLoadingSuccessful: Boolean = ...
+                //download data for `selectedItem`
+                if(isDataLoadingSuccessful) {
+                    callback()
+                }
+            }
+        }
+In this way selection changes will never be applied while `isDataLoadingSuccessful` is `false`.
