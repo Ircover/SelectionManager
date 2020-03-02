@@ -137,6 +137,23 @@ class SingleSelectionTest {
         assertTrue(isInterceptor2Called, "interceptor2 was not called")
     }
 
+    @Test
+    fun clearSelectionWithListener() {
+        val targetPosition = 2
+        var isListenerCalled = false
+        selectionManager.selectPosition(targetPosition)
+        selectionManager.registerSelectionChangeListener { position, isSelected ->
+            assertFalse(isSelected, "selected position should be cancelled")
+            assertEquals(targetPosition, position, "wrong position was cancelled")
+            assertFalse(selectionManager.isPositionSelected(targetPosition),
+                    "cancelled position should not be selected anymore")
+            isListenerCalled = true
+        }
+
+        selectionManager.clearSelection()
+        assertTrue(isListenerCalled, "listener wasn't called")
+    }
+
     @AfterEach
     fun clearSelection() {
         selectionManager.clearSelection()

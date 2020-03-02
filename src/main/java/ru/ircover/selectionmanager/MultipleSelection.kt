@@ -5,9 +5,12 @@ class MultipleSelection : SelectionManager {
     private val selectedPositions: MutableSet<Int> = mutableSetOf()
     private val interceptors: ArrayList<(Int, Boolean, () -> Unit) -> Unit> = arrayListOf()
     override fun clearSelection() {
-        selectedPositions.sortedBy { it }
-                .forEach { position -> notifyListeners(position, false) }
-        selectedPositions.clear()
+        if(selectedPositions.isNotEmpty()) {
+            val lastSelectedPositions = selectedPositions.toCollection(arrayListOf())
+            selectedPositions.clear()
+            lastSelectedPositions.sortedBy { it }
+                    .forEach { position -> notifyListeners(position, false) }
+        }
     }
 
     override fun selectPosition(position: Int) {

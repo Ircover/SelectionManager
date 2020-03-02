@@ -6,10 +6,11 @@ class SingleSelection : SelectionManager {
     private val interceptors: ArrayList<(Int, Boolean, () -> Unit) -> Unit> = arrayListOf()
 
     override fun clearSelection() {
-        if(selectedPosition != POSITION_INVALID) {
-            notifyListeners(selectedPosition, false)
+        val lastSelectedPosition = selectedPosition
+        if(lastSelectedPosition != POSITION_INVALID) {
+            selectedPosition = POSITION_INVALID
+            notifyListeners(lastSelectedPosition, false)
         }
-        selectedPosition = POSITION_INVALID
     }
     override fun selectPosition(position: Int) {
         if(selectedPosition != position) {
