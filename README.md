@@ -27,11 +27,11 @@ When this `SelectionManager` object is needed no more you should dispose your re
     fun destroy() {
         selectionDisposable.dispose()
     }
-Now you are ready to listen for changes. Selecting positions is as easy as calling one particular method - `selectPosition`:
+Now you are ready to listen for changes. Selecting positions is as easy as calling one particular method - `clickPosition`:
 
     class A(private val selectionManager: SelectionManager) {
         fun onItemClick(position: Int) {
-            selectionManager.selectPosition(position)
+            selectionManager.clickPosition(position)
         }
     }
 If you don't need to listen changes but want to get all selected positions in the end, you should call `getSelectedPositions` (all `SelectionManager` objects can do it):

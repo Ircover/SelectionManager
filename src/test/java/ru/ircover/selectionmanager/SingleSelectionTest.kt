@@ -20,9 +20,9 @@ class SingleSelectionTest {
         val targetPosition1 = 1
         val targetPosition2 = 2
 
-        selectionManager.selectPosition(targetPosition1)
-        selectionManager.selectPosition(targetPosition2)
-        selectionManager.selectPosition(targetPosition2)
+        selectionManager.clickPosition(targetPosition1)
+        selectionManager.clickPosition(targetPosition2)
+        selectionManager.clickPosition(targetPosition2)
 
         assertTrue(selectionManager.isPositionSelected(targetPosition2),
                 "pointed position $targetPosition2 should be selected")
@@ -31,13 +31,33 @@ class SingleSelectionTest {
     }
 
     @Test
+    fun deselectPosition_NotSelected() {
+        val targetPosition = 1
+        selectionManager.clickPosition(targetPosition)
+
+        selectionManager.deselectPosition(targetPosition + 1)
+
+        assertTrue(selectionManager.isPositionSelected(targetPosition))
+    }
+
+    @Test
+    fun deselectPosition_Selected() {
+        val targetPosition = 1
+        selectionManager.clickPosition(targetPosition)
+
+        selectionManager.deselectPosition(targetPosition)
+
+        assertFalse(selectionManager.isPositionSelected(targetPosition))
+    }
+
+    @Test
     fun getSelectedPositions() {
         val targetPosition1 = 1
         val targetPosition2 = 2
 
-        selectionManager.selectPosition(targetPosition1)
-        selectionManager.selectPosition(targetPosition2)
-        selectionManager.selectPosition(targetPosition2)
+        selectionManager.clickPosition(targetPosition1)
+        selectionManager.clickPosition(targetPosition2)
+        selectionManager.clickPosition(targetPosition2)
 
         assertEquals(arrayListOf(targetPosition2), selectionManager.getSelectedPositions(),
                 "selected positions list is not correct")
@@ -51,7 +71,7 @@ class SingleSelectionTest {
         var isTargetPosition1Processed = false
         var isTargetPosition2Processed = false
 
-        selectionManager.selectPosition(targetPosition1)
+        selectionManager.clickPosition(targetPosition1)
         val registrationDisposable = selectionManager.registerSelectionChangeListener { position, isSelected ->
             when(position) {
                 targetPosition1 -> {
@@ -72,9 +92,9 @@ class SingleSelectionTest {
                 }
             }
         }
-        selectionManager.selectPosition(targetPosition2)
+        selectionManager.clickPosition(targetPosition2)
         registrationDisposable.dispose()
-        selectionManager.selectPosition(targetPosition3)
+        selectionManager.clickPosition(targetPosition3)
 
         assertTrue(isTargetPosition1Processed,
                 "position $targetPosition1 deselect was not processed")
@@ -90,7 +110,7 @@ class SingleSelectionTest {
         var isInterceptor1Called = false
         var isInterceptor2Called = false
 
-        selectionManager.selectPosition(targetPosition1)
+        selectionManager.clickPosition(targetPosition1)
         var interceptorCallback1: (() -> Unit)? = null
         var interceptorCallback2: (() -> Unit)? = null
         val interceptorDisposable1 = selectionManager.addSelectionInterceptor { position, isSelected, callback ->
@@ -114,7 +134,7 @@ class SingleSelectionTest {
             isInterceptor2Called = true
         }
 
-        selectionManager.selectPosition(targetPosition2)
+        selectionManager.clickPosition(targetPosition2)
         assertNotNull(interceptorCallback1, "callback of interceptor1 was not set")
         assertNull(interceptorCallback2, "callback of interceptor2 should not be set yet")
         assertTrue(selectionManager.isPositionSelected(targetPosition1),
@@ -131,7 +151,7 @@ class SingleSelectionTest {
 
         interceptorDisposable1.dispose()
         interceptorDisposable2.dispose()
-        selectionManager.selectPosition(targetPosition3)
+        selectionManager.clickPosition(targetPosition3)
 
         assertTrue(isInterceptor1Called, "interceptor1 was not called")
         assertTrue(isInterceptor2Called, "interceptor2 was not called")
@@ -141,7 +161,7 @@ class SingleSelectionTest {
     fun clearSelectionWithListener() {
         val targetPosition = 2
         var isListenerCalled = false
-        selectionManager.selectPosition(targetPosition)
+        selectionManager.clickPosition(targetPosition)
         selectionManager.registerSelectionChangeListener { position, isSelected ->
             assertFalse(isSelected, "selected position should be cancelled")
             assertEquals(targetPosition, position, "wrong position was cancelled")

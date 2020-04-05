@@ -1,8 +1,9 @@
 package ru.ircover.selectionmanager
 
-class NoneSelection : SelectionManager {
+class NoneSelection : BaseInterceptableSelectionManager() {
     override fun clearSelection() { }
-    override fun selectPosition(position: Int) { }
+    override fun clickPosition(position: Int) { }
+    override fun deselectPosition(position: Int) { }
     override fun isPositionSelected(position: Int) = false
     override fun registerSelectionChangeListener(listener: (position: Int, isSelected: Boolean) -> Unit) =
             EmptyDisposable()

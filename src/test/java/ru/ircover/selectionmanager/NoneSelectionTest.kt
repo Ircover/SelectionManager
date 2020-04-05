@@ -15,10 +15,10 @@ internal class NoneSelectionTest {
     }
 
     @Test
-    fun selectPosition() {
+    fun clickPosition() {
         val targetPosition = 1
 
-        selectionManager.selectPosition(targetPosition)
+        selectionManager.clickPosition(targetPosition)
 
         assertFalse(selectionManager.isPositionSelected(targetPosition))
     }
