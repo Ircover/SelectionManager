@@ -2,8 +2,9 @@ package ru.ircover.selectionmanager
 
 import kotlin.collections.ArrayList
 
-class SelectableDataSource<T>(private var dataSource: ArrayList<T>,
-                              private val selectionManager: SelectionManager) : SelectionManager by selectionManager {
+open class SelectableDataSource<T>(private var dataSource: ArrayList<T>,
+                                   private val selectionManager: SelectionManager)
+    : SelectionManager by selectionManager {
     constructor(selectionManager: SelectionManager) : this(arrayListOf(), selectionManager)
 
     override fun clickPosition(position: Int) {
