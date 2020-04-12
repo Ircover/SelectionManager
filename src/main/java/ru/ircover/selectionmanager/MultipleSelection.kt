@@ -1,25 +1,34 @@
 package ru.ircover.selectionmanager
 
-class MultipleSelection : SelectionManager {
+class MultipleSelection : BaseInterceptableSelectionManager() {
     private val listeners: ArrayList<(position: Int, isSelected: Boolean) -> Unit> = arrayListOf()
     private val selectedPositions: MutableSet<Int> = mutableSetOf()
-    private val interceptors: ArrayList<(Int, Boolean, () -> Unit) -> Unit> = arrayListOf()
     override fun clearSelection() {
-        selectedPositions.sortedBy { it }
-                .forEach { position -> notifyListeners(position, false) }
-        selectedPositions.clear()
+        if(selectedPositions.isNotEmpty()) {
+            selectedPositions.sortedBy { it }
+                    .forEach(this::deselectPosition)
+        }
     }
 
-    override fun selectPosition(position: Int) {
+    override fun clickPosition(position: Int) {
         if(isPositionSelected(position)) {
             interceptors.withInterception(position, false) {
-                notifyListeners(position, false)
                 selectedPositions.remove(position)
+                notifyListeners(position, false)
             }
         } else {
             interceptors.withInterception(position, true) {
-                notifyListeners(position, true)
                 selectedPositions.add(position)
+                notifyListeners(position, true)
+            }
+        }
+    }
+
+    override fun deselectPosition(position: Int) {
+        if(isPositionSelected(position)) {
+            interceptors.withInterception(position, false) {
+                selectedPositions.remove(position)
+                notifyListeners(position, false)
             }
         }
     }
@@ -33,9 +42,6 @@ class MultipleSelection : SelectionManager {
             .toCollection(arrayListOf())
 
     override fun isAnySelected() = selectedPositions.isNotEmpty()
-
-    override fun addSelectionInterceptor(interceptor: (Int, Boolean, () -> Unit) -> Unit) =
-            createDisposableForListenerRegistration(interceptors, interceptor)
 
     private fun notifyListeners(position: Int, isSelected: Boolean) {
         listeners.forEach { it(position, isSelected) }

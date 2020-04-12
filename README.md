@@ -1,6 +1,6 @@
 # SelectionManager
 
-[ ![Download](https://api.bintray.com/packages/ircover/selection-manager/core/images/download.svg?version=1.0.0) ](https://bintray.com/ircover/selection-manager/core/1.0.0/link)
+[ ![Download](https://api.bintray.com/packages/ircover/selection-manager/core/images/download.svg?version=1.1.0) ](https://bintray.com/ircover/selection-manager/core/1.1.0/link)
 
 Library to include all logic about selecting items of lists.
 
@@ -27,11 +27,11 @@ When this `SelectionManager` object is needed no more you should dispose your re
     fun destroy() {
         selectionDisposable.dispose()
     }
-Now you are ready to listen for changes. Selecting positions is as easy as calling one particular method - `selectPosition`:
+Now you are ready to listen for changes. Selecting positions is as easy as calling one particular method - `clickPosition`:
 
     class A(private val selectionManager: SelectionManager) {
         fun onItemClick(position: Int) {
-            selectionManager.selectPosition(position)
+            selectionManager.clickPosition(position)
         }
     }
 If you don't need to listen changes but want to get all selected positions in the end, you should call `getSelectedPositions` (all `SelectionManager` objects can do it):
@@ -40,7 +40,7 @@ If you don't need to listen changes but want to get all selected positions in th
 
 ## Interception
 
-Sometimes you need to postpone selection changes until some action done, for example, loading data about selected item. Here you can use interception and used for that method `addSelectionInterceptor`:
+Sometimes you need to postpone selection changes until some action done, for example, loading data about selected item. Here you can use interception and used for that method `addSelectionInterceptor`, which is part of `InterceptableSelectionManager` interface:
 
     val interceptionDisposable =
         selection.addSelectionInterceptor { position: Int, isSelected: Boolean, callback: () -> Unit ->
@@ -54,3 +54,29 @@ Sometimes you need to postpone selection changes until some action done, for exa
             }
         }
 In this way selection changes will never be applied while `isDataLoadingSuccessful` is `false`.
+
+## Data Source
+
+In case you want to hold your items list with selected positions in one place, in version 1.1.0 was added `SelectableDataSource` class (and it's inheritor `InterceptableSelectableDataSource` to use interceptions). It's pretty easy to use it: put in constructor `SelectionManager` you want, starting items list is optional. After that it's the same as usage of `SelectionManager` itself, but there are some extra features:
+    
+You can change items list with different existing selection processing.
+
+    usersDataSource.setDataSource(newUsers1, ChangeDataSourceMode.ClearAllSelection) //default one, in this case you can leave only the first parameter
+    usersDataSource.setDataSource(newUsers2, ChangeDataSourceMode.HoldSelectedPositions)
+    usersDataSource.setDataSource(newUsers3, ChangeDataSourceMode.HoldSelectedItems)
+
+You can get selected items list, but not only positions of them.
+
+    val selectedUsed: ArrayList<User> = usersDataSource.getSelectedItems()
+    
+As the previous one, listening for selected items works now not only for positions.
+
+    val disposable = usersDataSource.registerItemSelectionChangeListener { item: User, isSelected: Boolean ->
+        if(isSelected) { /* Do whatever you want with selected user */ }
+    }
+    
+By the way, if you still need to work with items positions, `SelectableDataSource` class looking after selected indexes to exclude any `OutofBoundsException`s in your listeners.
+
+#### Warning!
+
+Make sure you are registering listener in `SelectableDataSource` object, not in `SelectionManager` you placed in its constructor. Otherwise you may still catch changing selection of item positions, that is out of items list size (after shortening items list).
