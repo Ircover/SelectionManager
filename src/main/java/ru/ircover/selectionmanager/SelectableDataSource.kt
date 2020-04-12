@@ -1,10 +1,10 @@
 package ru.ircover.selectionmanager
 
-import kotlin.collections.ArrayList
-
-open class SelectableDataSource<T>(private var dataSource: ArrayList<T>,
+open class SelectableDataSource<T>(dataSource: ArrayList<T>,
                                    private val selectionManager: SelectionManager)
     : SelectionManager by selectionManager {
+    var dataSource: ArrayList<T> = dataSource
+        private set
     constructor(selectionManager: SelectionManager) : this(arrayListOf(), selectionManager)
 
     override fun clickPosition(position: Int) {
@@ -26,31 +26,45 @@ open class SelectableDataSource<T>(private var dataSource: ArrayList<T>,
                       changeMode: ChangeDataSourceMode = ChangeDataSourceMode.ClearAllSelection) {
         when(changeMode) {
             ChangeDataSourceMode.ClearAllSelection -> {
-                this.dataSource = dataSource
+                this.dataSource = dataSource.cloneTypedly()
                 selectionManager.clearSelection()
             }
             ChangeDataSourceMode.HoldSelectedPositions -> {
-                this.dataSource = dataSource
+                this.dataSource = dataSource.cloneTypedly()
                 selectionManager.getSelectedPositions()
                         .filter { it >= dataSource.size }
-                        .forEach(selectionManager::deselectPosition)
+                        .forEach(::deselectPosition)
             }
             ChangeDataSourceMode.HoldSelectedItems -> {
                 val lastItems = this.dataSource
-                this.dataSource = dataSource
+                this.dataSource = dataSource.cloneTypedly()
                 val lastSelectedPosition = selectionManager.getSelectedPositions()
                 lastSelectedPosition.filterWrongPositionItems(lastItems, dataSource)
-                        .forEach(selectionManager::deselectPosition)
+                        .forEach(::deselectPosition)
                 lastSelectedPosition.asSequence()
                         .filter { it < dataSource.size }
                         .map { dataSource.indexOf(lastItems[it]) }
                         .filter { it != POSITION_INVALID && !selectionManager.isPositionSelected(it) }
-                        .forEach(selectionManager::clickPosition)
+                        .forEach(::clickPosition)
             }
         }
     }
 
+    override fun registerSelectionChangeListener(listener: (position: Int, isSelected: Boolean) -> Unit): Disposable =
+        selectionManager.registerSelectionChangeListener { position, isSelected ->
+            if(position >= 0 && position < dataSource.size){
+                listener(position, isSelected)
+            }
+        }
+
+    fun registerItemSelectionChangeListener(listener: (item: T, isSelected: Boolean) -> Unit): Disposable =
+        registerSelectionChangeListener { position, isSelected ->
+            listener(dataSource[position], isSelected)
+        }
+
     private fun ArrayList<Int>.filterWrongPositionItems(arrayListSource: ArrayList<T>, arrayListDest: ArrayList<T>) =
-        filter { it < arrayListDest.size &&
-                (!arrayListDest.contains(arrayListSource[it]) || arrayListDest.indexOf(arrayListSource[it]) != it) }
+        filter { !arrayListDest.contains(arrayListSource[it]) || arrayListDest.indexOf(arrayListSource[it]) != it }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> ArrayList<T>.cloneTypedly() = clone() as ArrayList<T>
 }

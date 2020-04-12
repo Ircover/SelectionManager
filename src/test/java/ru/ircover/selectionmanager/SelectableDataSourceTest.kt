@@ -91,7 +91,8 @@ class SelectableDataSourceTest {
         dataSource.setDataSource(arrayListOf("test1", "test3", "test5"), ChangeDataSourceMode.HoldSelectedItems)
 
         verify(selectionManagerMock).deselectPosition(2)
-        verify(selectionManagerMock, never()).deselectPosition(intThat { it != 2 })
+        verify(selectionManagerMock).deselectPosition(3)
+        verify(selectionManagerMock, never()).deselectPosition(intThat { it !in listOf(2, 3) })
         verify(selectionManagerMock).clickPosition(1)
         verify(selectionManagerMock, never()).clickPosition(intThat { it != 1 })
     }
