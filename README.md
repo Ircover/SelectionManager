@@ -67,7 +67,7 @@ You can change items list with different existing selection processing.
 
 You can get selected items list, but not only positions of them.
 
-    val selectedUsed: ArrayList<User> = usersDataSource.getSelectedItems()
+    val selectedUsers: ArrayList<User> = usersDataSource.getSelectedItems()
     
 As the previous one, listening for selected items works now not only for positions.
 
